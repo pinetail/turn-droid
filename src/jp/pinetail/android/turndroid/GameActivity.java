@@ -8,10 +8,12 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class GameActivity extends Activity implements SensorEventListener {
+public class GameActivity extends Activity implements SensorEventListener, Runnable {
 
 	private SensorManager mSensorManager;
 	private Integer[] Azimuth = {0,0};
@@ -30,11 +32,21 @@ public class GameActivity extends Activity implements SensorEventListener {
     float[] orientationValues   = new float[3];
     float[] magneticValues      = new float[3];
     float[] accelerometerValues = new float[3];
+    
+    private long endTime;
+	private Thread thread;
+	private Handler mHandler = new Handler();
+	private static long gameTime = 30000;
 	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.game);
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		endTime = System.currentTimeMillis() + 31000;
+		
+		thread = new Thread(this);
+		thread.start();
+		
 	}
 	
 	public void onAccuracyChanged(Sensor sensor, int accuracy) {
@@ -77,7 +89,7 @@ public class GameActivity extends Activity implements SensorEventListener {
 	}
 */
 	public void onSensorChanged(SensorEvent event) {
-		// TODO 自動生成されたメソッド・スタブ
+		
 		if (event.sensor.getType() == Sensor.TYPE_ORIENTATION) {
 			
 			if (FirstAzimuth == 0) {
@@ -86,6 +98,11 @@ public class GameActivity extends Activity implements SensorEventListener {
 			
 			TextView text    = (TextView) findViewById(R.id.text);
 			text.setText("方位："+String.valueOf(event.values[0])+":傾き："+String.valueOf(event.values[1])+":"+String.valueOf(event.values[2]));
+			
+			// 傾きが45°以上の場合、処理しない
+			if (-45 > event.values[1] || event.values[1] > 45) {
+				return;
+			}
 			
 			if (0 <= FirstAzimuth && FirstAzimuth <= 90) {
 				// 180~270
@@ -176,6 +193,7 @@ public class GameActivity extends Activity implements SensorEventListener {
 		super.onPause();
 		//
 		mSensorManager.unregisterListener(this);
+		thread = null;
 	}
 	/*
 	private boolean mIsMagSensor;
@@ -217,6 +235,32 @@ public class GameActivity extends Activity implements SensorEventListener {
 		Sensor sensor = list.get(0);
 		
 		mSensorManager.registerListener(this, sensor, SensorManager.SENSOR_DELAY_FASTEST);
+		
+	}
+
+	public void run() {
+		while (thread != null) {
+			final long time = endTime - System.currentTimeMillis();
+			mHandler.post(new Runnable() {
+	    		public void run() {
+	    			TextView txt_time = (TextView) findViewById(R.id.txt_time);
+	    			txt_time.setText(String.valueOf(time/1000));
+
+	    			if (time/1000 == 0) {
+	    				Toast.makeText(GameActivity.this, TurnCnt + "回転！！", Toast.LENGTH_LONG).show();
+	    				thread = null;
+	    			}
+	    		}
+	    	});
+
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO 自動生成された catch ブロック
+				e.printStackTrace();
+			}
+		}
+
 	}
 	
 
