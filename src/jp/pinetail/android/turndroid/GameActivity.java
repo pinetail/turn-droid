@@ -42,6 +42,7 @@ public class GameActivity extends Activity implements SensorEventListener, Runna
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.game);
 		mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+		// I—¹ŠÔİ’è
 		endTime = System.currentTimeMillis() + 31000;
 		
 		thread = new Thread(this);
