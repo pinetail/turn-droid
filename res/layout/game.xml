@@ -10,6 +10,6 @@
     android:text="@string/hello"
     />
 <TextView android:text="@+id/TextView01" android:id="@+id/text" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
-<TextView android:text="@+id/TextView01" android:id="@+id/txt_cnt" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
+<TextView android:text="@+id/TextView" android:id="@+id/txt_cnt" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 <TextView android:text="30" android:id="@+id/txt_time" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
 </LinearLayout>
